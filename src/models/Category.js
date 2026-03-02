@@ -15,7 +15,7 @@ const categorySchema = new mongoose.Schema({
 categorySchema.pre("deleteOne", { document: true, query: false }, async function (next) {
     try {
         await Product.deleteMany({ category: this._id });
-        next;
+        next();
     } catch (error) {
         next(error);
     }

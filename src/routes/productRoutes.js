@@ -5,8 +5,20 @@ const router = express.Router();
 
 // get all product
 router.get("/", async (req, res) => {
-    const data = await Product.find();
-    res.json({ message: "Get all product", data });
+    try {
+        let filter = {};
+
+        // If category query exists
+        if (req.query.category) {
+            filter.category = req.query.category;
+        }
+
+        const products = await Product.find(filter).populate("category");
+
+        res.json(products);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 // get product by ID
