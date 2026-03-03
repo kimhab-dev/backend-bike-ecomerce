@@ -1,90 +1,123 @@
-import express from "express"
-import Product from "../models/Product.js"
+import express from "express";
+import Product from "../models/Product.js";
 
 const router = express.Router();
 
-// get all product
+// ✅ Get all products
 router.get("/", async (req, res) => {
     try {
         let filter = {};
 
-        // If category query exists
         if (req.query.category) {
             filter.category = req.query.category;
         }
 
         const products = await Product.find(filter).populate("category");
 
-        res.json(products);
+        // match desired response format with a top-level data key
+        res.json({
+            data: products,
+        });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ success: false, message: err.message });
     }
 });
 
-// get product by ID
+// ✅ Get product by ID
 router.get("/:id", async (req, res) => {
     try {
-        const data = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id).populate("category");
 
         if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Product not found",
+            });
         }
 
-        res.json({ message: "Create product success", data });
+        // return only the product inside data wrapper
+        res.json({
+            data: product,
+        });
     } catch (err) {
-        res.status(400).json({ message: "Invalid product ID" });
+        res.status(400).json({
+            success: false,
+            message: "Invalid product ID",
+        });
     }
 });
 
-
-// create product
+// ✅ Create product
 router.post("/", async (req, res) => {
     try {
         const product = new Product(req.body);
-        const createProduct = await product.save();
-        res.status(201).json(createProduct);
+        const createdProduct = await product.save();
+
+        res.status(201).json({
+            success: true,
+            message: "Product created successfully",
+            data: createdProduct,
+        });
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({
+            success: false,
+            message: err.message,
+        });
     }
 });
 
-// update product
+// ✅ Update product
 router.put("/:id", async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
 
         if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Product not found",
+            });
         }
 
-        product.name = req.body.name ?? product.name;
-        product.price = req.body.price ?? product.price;
-        product.description = req.body.description ?? product.description;
-        product.category = req.body.category ?? product.category;
-        product.image = req.body.image ?? product.image;
-        product.countInStock = req.body.countInStock ?? product.countInStock;
+        Object.assign(product, req.body);
 
         const updatedProduct = await product.save();
-        res.json(updatedProduct);
 
+        res.json({
+            success: true,
+            message: "Product updated successfully",
+            data: updatedProduct,
+        });
     } catch (err) {
-        res.status(400).json({ message: "Invalid product ID" });
+        res.status(400).json({
+            success: false,
+            message: "Invalid product ID",
+        });
     }
 });
 
+// ✅ Delete product
 router.delete("/:id", async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
 
         if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Product not found",
+            });
         }
 
         await product.deleteOne();
-        res.json({ message: "Product deleted successfully" });
 
+        res.json({
+            success: true,
+            message: "Product deleted successfully",
+        });
     } catch (err) {
-        res.status(400).json({ message: "Invalid product ID" });
+        res.status(400).json({
+            success: false,
+            message: "Invalid product ID",
+        });
     }
 });
 
