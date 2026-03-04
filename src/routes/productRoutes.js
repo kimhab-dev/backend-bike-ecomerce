@@ -4,20 +4,30 @@ import Product from "../models/Product.js";
 const router = express.Router();
 
 // ✅ Get all products
+// ✅ Get all products with category filter + search
 router.get("/", async (req, res) => {
     try {
         let filter = {};
 
+        // Filter by category
         if (req.query.category) {
             filter.category = req.query.category;
         }
 
+        // Search by product name (case-insensitive)
+        if (req.query.search) {
+            filter.name = {
+                $regex: req.query.search,
+                $options: "i", // case insensitive
+            };
+        }
+
         const products = await Product.find(filter).populate("category");
 
-        // match desired response format with a top-level data key
         res.json({
             data: products,
         });
+
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
