@@ -9,6 +9,10 @@ const orderSchema = new mongoose.Schema({
         },
     ],
     totalPrice: Number,
+    paymentMethod: { type: String, default: 'Bakong' },
+    bakongMD5: { type: String },
+    isPaid: { type: Boolean, default: false },
+    paidAt: { type: Date },
     status: { type: String, default: "Pending" },
 }, { timestamps: true });
 
