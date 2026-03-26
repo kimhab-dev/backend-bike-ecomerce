@@ -6,23 +6,30 @@ const router = express.Router();
 
 // Add to cart
 router.post("/", protect, async (req, res) => {
-    const { productId, quantity } = req.body;
+    const { productId } = req.body;
 
     const cartItem = await Cart.create({
         user: req.user._id,
         product: productId,
-        quantity,
     });
 
-    res.json(cartItem);
+    res.json({
+        result: true,
+        message: "Add to card successfully.",
+        data: cartItem
+    });
 });
 
 // Get cart
 router.get("/", protect, async (req, res) => {
     const items = await Cart.find({ user: req.user._id })
         .populate("product");
-
-    res.json(items);
+    res.json({
+        result: true,
+        message: "Get all card successfully.",
+        totalItems: items.length,
+        data: items
+    });
 });
 
 export default router;

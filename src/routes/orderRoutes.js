@@ -26,7 +26,6 @@ router.post("/", protect, async (req, res) => {
         const haha = new BakongKHQR();
         const result = haha.generateIndividual(individualInfo);
 
-        console.log(result);
         if (result.status.code !== 0) {
             return res.status(400).json({ message: "Cannot generate KHQR" });
         }
@@ -50,7 +49,6 @@ router.post("/", protect, async (req, res) => {
     }
 });
 
-// Update order status ទៅជា Paid (សម្រាប់ប្រើពេល Demo)
 router.put("/:id/pay", protect, async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);

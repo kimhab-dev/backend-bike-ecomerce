@@ -5,7 +5,12 @@ const router = express.Router();
 
 router.get("/", async (requestAnimationFrame, res) => {
     const categories = await Category.find();
-    res.json(categories);
+    res.json({
+        result: true,
+        message: "Get all category seccessfully.",
+        totalItem: categories.length,
+        data: categories
+    });
 });
 
 // create category
@@ -13,7 +18,11 @@ router.post("/", async (req, res) => {
     try {
         const category = new Category(req.body);
         const createCategory = await category.save();
-        res.status(201).json({ message: "Created Success", createCategory });
+        res.status(201).json({
+            result: true,
+            message: "Created Successfully",
+            data: createCategory
+        });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
